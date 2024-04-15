@@ -4,7 +4,8 @@ name: xlog
 #on: [workflow_dispatch]
 on:
   push:
-    branches: [ "master", "develop" ]
+#    branches: [ "master", "develop" ]
+    branches: [ "master" ]
 #  pull_request:
 #    branches: [ "master" ]
 
@@ -14,7 +15,7 @@ jobs:
 #    runs-on: self-hosted
     strategy:
       matrix:
-        go: [ '1.17', '1.18' , '1.19'  , '1.20' , '1.21' ]
+        go: [ '1.17', '1.18' , '1.19'  , '1.20' , '1.21' , '1.22' ]
     steps:
       - uses: actions/checkout@v4
 
