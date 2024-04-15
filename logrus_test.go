@@ -1,6 +1,7 @@
 package xlog
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -9,16 +10,31 @@ import (
 )
 
 func TestLogrus(t *testing.T) {
+	logrus.SetReportCaller(true)
+	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.Debugf("debug log")
 	logrus.Infof("info log")
 	logrus.Errorf("error log")
+	p := &parent{}
+	p.Test()
 
 	SetUpLogrus(nil)
+	fmt.Println("=========================")
 
 	logrus.Debugf("debug log")
 	logrus.Infof("info log")
 	logrus.Errorf("error log")
 
+	p.Test()
+}
+
+type parent struct {
+}
+
+func (p *parent) Test() {
+	logrus.Debugf("debug log")
+	logrus.Infof("info log")
+	logrus.Errorf("error log")
 }
 
 func TestLogrusInfoLevel(t *testing.T) {

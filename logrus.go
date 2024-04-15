@@ -3,7 +3,6 @@ package xlog
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"path"
 	"runtime"
 	"strings"
 )
@@ -18,12 +17,17 @@ func SetUpLogrus(logger *logrus.Logger) {
 	//logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetFormatter(&logrus.JSONFormatter{
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
-			i := strings.LastIndex(frame.Function, ".")
-			shortFuncName := frame.Function[i+1:]
-			filepath := frame.Function[:i]
-			_, fileName := path.Split(frame.File)
-			filepath = filepath + "/" + fileName
-			return shortFuncName, fmt.Sprintf("%s:%d", filepath, frame.Line)
+			// origin: {"file":"/Users/xxx/xlog/logrus_test.go:17","func":"github.com/taobig/xlog.TestLogrus","level":"error","msg":"error log","time":"2024-04-13T16:00:00Z"}
+			// origin: {"file":"/Users/xxx/xlog/logrus_test.go:17","func":"github.com/taobig/xlog.(*parent).Test","level":"error","msg":"error log","time":"2024-04-13T16:00:00Z"}
+			//i := strings.LastIndex(frame.Function, ".")
+			i := strings.LastIndex(frame.Function, "/")
+			str := frame.Function[i+1:]
+			j := strings.Index(str, ".")
+			shortFuncName := str[j+1:]
+			//_, fileName := path.Split(frame.File)
+			//filepath := frame.Function[:i] + "/" + fileName
+			//return shortFuncName, fmt.Sprintf("%s:%d", filepath, frame.Line)
+			return shortFuncName, fmt.Sprintf("%s:%d", frame.File, frame.Line)
 		},
 	})
 }
