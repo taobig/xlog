@@ -10,7 +10,6 @@ import (
 )
 
 func TestLogrus(t *testing.T) {
-	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.Debugf("debug log")
 	logrus.Infof("info log")
@@ -18,7 +17,17 @@ func TestLogrus(t *testing.T) {
 	p := &parent{}
 	p.Test()
 
-	SetUpLogrus(nil)
+	fmt.Println("=========================")
+
+	logrus.SetReportCaller(true)
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.Debugf("debug log")
+	logrus.Infof("info log")
+	logrus.Errorf("error log")
+	p = &parent{}
+	p.Test()
+
+	SetUp(true)
 	fmt.Println("=========================")
 
 	logrus.Debugf("debug log")
@@ -44,7 +53,7 @@ func TestLogrusInfoLevel(t *testing.T) {
 	logrus.Infof("info log")
 	logrus.Errorf("error log")
 
-	SetUpLogrus(nil)
+	SetUp(true)
 
 	logrus.Debugf("debug log")
 	logrus.Infof("info log")
@@ -106,7 +115,7 @@ func TestLogrusWriteFile2(t *testing.T) {
 	log.Infof("info log")
 	log.Errorf("error log")
 
-	SetUpLogrus(log)
+	SetUpWithLogger(log, true)
 
 	log.Debugf("debug log")
 	log.Infof("info log")
