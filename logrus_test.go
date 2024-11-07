@@ -3,7 +3,8 @@ package xlog
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/taobig/xlog/logger"
 	"os"
 	"sync"
 	"testing"
@@ -65,14 +66,12 @@ func TestLogrusWriteFile(t *testing.T) {
 	// You could set this to any `io.Writer` such as a file
 	filename := "logrus.log"
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		assert.NoErrorf(t, err, "Failed to log to file, using default stderr")
-	}
+	require.NoErrorf(t, err, "Failed to log to file, using default stderr")
 	logrus.SetOutput(file)
 
 	defer func() {
 		err = os.Remove(filename)
-		assert.NoErrorf(t, err, "Failed to remove file: %s", filename)
+		require.NoErrorf(t, err, "Failed to remove file: %s", filename)
 	}()
 
 	var wg sync.WaitGroup
@@ -91,10 +90,10 @@ func TestLogrusWriteFile(t *testing.T) {
 	wg.Wait()
 
 	content, err := os.ReadFile(filename)
-	assert.NoErrorf(t, err, "Failed to read file: %s", filename)
-	assert.Containsf(t, string(content), "debug log", "Failed to read file: %s", filename)
-	assert.Containsf(t, string(content), "info log", "Failed to read file: %s", filename)
-	assert.Containsf(t, string(content), "error log", "Failed to read file: %s", filename)
+	require.NoErrorf(t, err, "Failed to read file: %s", filename)
+	require.Containsf(t, string(content), "debug log", "Failed to read file: %s", filename)
+	require.Containsf(t, string(content), "info log", "Failed to read file: %s", filename)
+	require.Containsf(t, string(content), "error log", "Failed to read file: %s", filename)
 }
 
 func TestLogrusWriteFile2(t *testing.T) {
@@ -102,13 +101,13 @@ func TestLogrusWriteFile2(t *testing.T) {
 	filename := "logrus.log"
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		assert.NoErrorf(t, err, "Failed to log to file, using default stderr")
+		require.NoErrorf(t, err, "Failed to log to file, using default stderr")
 	}
 	log.SetOutput(file)
 
 	defer func() {
 		err = os.Remove(filename)
-		assert.NoErrorf(t, err, "Failed to remove file: %s", filename)
+		require.NoErrorf(t, err, "Failed to remove file: %s", filename)
 	}()
 
 	log.Debugf("debug log")
@@ -120,4 +119,18 @@ func TestLogrusWriteFile2(t *testing.T) {
 	log.Debugf("debug log")
 	log.Infof("info log")
 	log.Errorf("error log")
+}
+
+func TestRollingLog(t *testing.T) {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetReportCaller(true)
+
+	const logFileName = "logrus_rolling.log"
+	rollingLogger, err := logger.NewRollingLogger(logFileName, 200, 10, 28, false, false)
+	require.NoErrorf(t, err, "Failed to setupRollingLogger, err: %v", err)
+	logrus.SetOutput(rollingLogger)
+
+	logrus.Debugf("debug log")
+	logrus.Infof("info log")
+	logrus.Errorf("error log")
 }
