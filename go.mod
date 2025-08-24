@@ -1,6 +1,8 @@
 module github.com/taobig/xlog
 
-go 1.17
+go 1.21
+
+toolchain go1.21.13
 
 require (
 	github.com/sirupsen/logrus v1.9.3
